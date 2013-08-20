@@ -9,4 +9,4 @@ Mapache is a webserver developed during the Network Programming course MAC5910 t
 Development debug
 -----------------
 
-```curl -v -X OPTIONS http://10.7.22.9```
+``curl -v -X OPTIONS http://10.7.22.9``
