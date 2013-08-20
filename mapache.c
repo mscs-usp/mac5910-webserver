@@ -1,4 +1,9 @@
-/* Por Prof. Daniel Batista <batista@ime.usp.br>
+/* Por:
+ *   Albert De La Fuente
+ *   Renan Melo 
+ *
+ * Originalmente:
+ * Por Prof. Daniel Batista <batista@ime.usp.br>
  * Em 12/08/2013
  * 
  * Um código simples (não é o código ideal, mas é o suficiente para o
