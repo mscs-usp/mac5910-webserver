@@ -1,6 +1,6 @@
 /* Por:
- *   Albert De La Fuente
- *   Renan Melo 
+ *   Albert De La Fuente <albert@ime.usp.br>
+ *   Renan De Melo <> 
  *
  * Originalmente:
  * Por Prof. Daniel Batista <batista@ime.usp.br>

@@ -1,13 +1,39 @@
-all: server
+# project name (generate executable with this name)
+TARGET   = mapache
 
-server: mapache.o
-	gcc mapache.o -o mapache
+CC       = gcc
+# compiling flags here
+CFLAGS   = -std=c99 -Wall -I.
 
-main.o: mapache.c
-	gcc -c mapache.c
+LINKER   = gcc -o
+# linking flags here
+LFLAGS   = -Wall -I. -lm
 
-#hello.o: hello.c
-#	gcc -c hello.c
+# change these to set the proper directories where each files shoould be
+SRCDIR   = src
+OBJDIR   = obj
+BINDIR   = bin
 
+SOURCES  := $(wildcard $(SRCDIR)/*.c)
+INCLUDES := $(wildcard $(SRCDIR)/*.h)
+OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+rm       = rm -f
+
+
+$(BINDIR)/$(TARGET): $(OBJECTS)
+	@$(LINKER) $@ $(LFLAGS) $(OBJECTS)
+	@echo "Linking complete!"
+
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Compiled "$<" successfully!"
+
+.PHONEY: clean
 clean:
-	rm -rf *o mapache
+	@$(rm) $(OBJECTS)
+	@echo "Cleanup complete!"
+
+.PHONEY: remove
+remove: clean
+	@$(rm) $(BINDIR)/$(TARGET)
+	@echo "Executable removed!"
