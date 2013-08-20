@@ -1,4 +1,4 @@
-script: make server
+script: make 
 language: c
 compiler:
   - gcc
