@@ -1,5 +1,4 @@
 install: make server
-script: scons
 language: c
 compiler:
   - gcc
