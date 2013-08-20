@@ -1,3 +1,6 @@
+# Output directories
+bin
+
 # Object files
 *.o
 
