@@ -10,8 +10,7 @@ Development debug
 -----------------
 
 ``curl -v -X OPTIONS http://<IP>``
-``
-* About to connect() to <IP> port 80 (#0)
+``* About to connect() to <IP> port 80 (#0)
 *   Trying <IP>...
 * connected
 * Connected to <IP> (<IP>) port 80 (#0)
@@ -28,5 +27,4 @@ Development debug
 < Content-Type: text/html
 < 
 * Connection #0 to host <IP> left intact
-* Closing connection #0
-``
+* Closing connection #0``
