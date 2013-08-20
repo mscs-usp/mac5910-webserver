@@ -1,4 +1,4 @@
-install: make server
+script: make server
 language: c
 compiler:
   - gcc
