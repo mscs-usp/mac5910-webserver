@@ -37,3 +37,6 @@ clean:
 remove: clean
 	@$(rm) $(BINDIR)/$(TARGET)
 	@echo "Executable removed!"
+
+run:
+	./bin/mapache 8000
