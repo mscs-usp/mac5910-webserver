@@ -52,38 +52,38 @@
 enum Req_Method { GET, POST, OPTIONS, UNSUPPORTED };
 
 struct ReqInfo {
-    enum Req_Method method;
-    char           *referer;
-    char           *useragent;
-    char           *resource;
-    int             status;
+	enum Req_Method method;
+	char           *referer;
+	char           *useragent;
+	char           *resource;
+	int             status;
 };
 
 void Error_Quit(char const * msg) {
-    fprintf(stderr, "WEBSERV: %s\n", msg);
-    exit(EXIT_FAILURE);
+	fprintf(stderr, "WEBSERV: %s\n", msg);
+	exit(EXIT_FAILURE);
 }
 
 ssize_t Writeline(int sockd, const void *vptr, size_t n) {
-    size_t      nleft;
-    ssize_t     nwritten;
-    const char *buffer;
+	size_t      nleft;
+	ssize_t     nwritten;
+	const char *buffer;
 
-    buffer = vptr;
-    nleft  = n;
+	buffer = vptr;
+	nleft  = n;
 
-    while ( nleft > 0 ) {
-	if ( (nwritten = write(sockd, buffer, nleft)) <= 0 ) {
-	    if ( errno == EINTR )
-		nwritten = 0;
-	    else
-		Error_Quit("Error Writeline()");
+	while ( nleft > 0 ) {
+		if ( (nwritten = write(sockd, buffer, nleft)) <= 0 ) {
+			if ( errno == EINTR )
+				nwritten = 0;
+			else
+				Error_Quit("Error Writeline()");
+		}
+		nleft  -= nwritten;
+		buffer += nwritten;
 	}
-	nleft  -= nwritten;
-	buffer += nwritten;
-    }
 
-    return n;
+	return n;
 }
 
 int Cabecalho_HTTP(int conn, struct ReqInfo * reqinfo) {
@@ -94,8 +94,6 @@ int Cabecalho_HTTP(int conn, struct ReqInfo * reqinfo) {
 	Writeline(conn, buffer, strlen(buffer));
 
 	Writeline(conn, "Server: Mapache v0.1\r\n", 20);
-//	WriteLine(conn, "Allow: POST,OPTIONS,GET", 23);
-//	WriteLine(conn, "Content-Length: 0", 17);
 	Writeline(conn, "Content-Type: text/html\r\n", 25);
 	Writeline(conn, "\r\n", 2);
 
@@ -115,11 +113,19 @@ int comando_options(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	sprintf(buffer, "HTTP/1.0 %d OK\r\n", reqinfo->status);
 	Writeline(connfd, buffer, strlen(buffer));
 
-	Writeline(connfd, "Server: Mapache v0.1\r\n", 20);
-	Writeline(connfd, "Allow: POST,OPTIONS,GET", 23);
-	Writeline(connfd, "Content-Length: 0", 17);
-	Writeline(connfd, "Content-Type: text/html\r\n", 25);
-	Writeline(connfd, "\r\n", 2);
+	sprintf(buffer, "Server: Mapache v0.1\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+
+	sprintf(buffer, "Allow: POST,OPTIONS,GET\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+
+	sprintf(buffer, "Content-Length: 0\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+
+	sprintf(buffer, "Content-Type: text/html\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+	sprintf(buffer, "\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
 
 	return 0;
 }
@@ -129,7 +135,6 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 		reqinfo->method = OPTIONS;
 		reqinfo->status = 200;
 		comando_options(connfd, recvline, reqinfo);
-		printf("OPTIONS!");;
 	}
 }
 
