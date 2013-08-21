@@ -131,7 +131,16 @@ int comando_options(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 }
 
 int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
-	if (!strncmp(recvline, "OPTIONS ", 8)) {
+	char *metodo;
+	char *recurso;
+	char *versaoHTTP;
+	metodo = strtok(recvline," ");
+	recurso = strtok (NULL, " ");
+	versaoHTTP = strtok (NULL, " ");
+
+	printf("Metodo: %s, b:%s, c:%s",metodo,recurso,versaoHTTP);
+
+	if (!strcmp(metodo,"OPTIONS")){
 		reqinfo->method = OPTIONS;
 		reqinfo->status = 200;
 		comando_options(connfd, recvline, reqinfo);
@@ -266,6 +275,8 @@ int main (int argc, char **argv) {
 				}*/
 //				write(connfd, recvline, strlen(recvline));
 			}
+
+			//processa comando...
 			/* ========================================================= */
 			/* ========================================================= */
 			/*                         EP1 FIM                           */

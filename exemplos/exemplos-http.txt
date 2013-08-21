@@ -1,0 +1,40 @@
+
+
+Request:
+	OPTIONS * HTTP/1.1
+	Host: example.com
+
+Response:
+
+	HTTP/1.1 200 OK
+	Date: …
+	Allow: OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE
+	Content-Length: 0
+
+
+Request:
+	GET /foo/bar HTTP/1.1
+	Host: example.com
+
+Response:
+	HTTP/1.1 200 OK
+	Date: …
+	Content-Type: text/html;charset=utf-8
+	Content-Length: 12345
+ 
+	<!DOCTYPE …
+
+
+Request:
+	POST /foo/bar HTTP/1.1
+	Host: example.com
+	Content-Type: application/x-www-form-urlencoded
+	 
+	action=addentry&subject=Hello,%20World
+
+Response:
+
+	HTTP/1.1 201 Created
+	Date: …
+	Content-Length: 0
+	Location: http://example.com/foo/bar 
