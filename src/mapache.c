@@ -49,6 +49,90 @@
 #define MAXDATASIZE 100
 #define MAXLINE 4096
 
+enum Req_Method { GET, POST, OPTIONS, UNSUPPORTED };
+
+struct ReqInfo {
+    enum Req_Method method;
+    char           *referer;
+    char           *useragent;
+    char           *resource;
+    int             status;
+};
+
+void Error_Quit(char const * msg) {
+    fprintf(stderr, "WEBSERV: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+ssize_t Writeline(int sockd, const void *vptr, size_t n) {
+    size_t      nleft;
+    ssize_t     nwritten;
+    const char *buffer;
+
+    buffer = vptr;
+    nleft  = n;
+
+    while ( nleft > 0 ) {
+	if ( (nwritten = write(sockd, buffer, nleft)) <= 0 ) {
+	    if ( errno == EINTR )
+		nwritten = 0;
+	    else
+		Error_Quit("Error Writeline()");
+	}
+	nleft  -= nwritten;
+	buffer += nwritten;
+    }
+
+    return n;
+}
+
+int Cabecalho_HTTP(int conn, struct ReqInfo * reqinfo) {
+
+	char buffer[100];
+
+	sprintf(buffer, "HTTP/1.0 %d OK\r\n", reqinfo->status);
+	Writeline(conn, buffer, strlen(buffer));
+
+	Writeline(conn, "Server: Mapache v0.1\r\n", 20);
+//	WriteLine(conn, "Allow: POST,OPTIONS,GET", 23);
+//	WriteLine(conn, "Content-Length: 0", 17);
+	Writeline(conn, "Content-Type: text/html\r\n", 25);
+	Writeline(conn, "\r\n", 2);
+
+	return 0;
+}
+
+int comando_options(int connfd, char * recvline, struct ReqInfo * reqinfo) {
+/* HTTP/1.1 200 OK
+ * < Date: Wed, 21 Aug 2013 01:17:31 GMT
+ * < Server: Apache/2.2.22 (Linux/SUSE)
+ * < Allow: POST,OPTIONS,GET,HEAD,TRACE
+ * < Content-Length: 0
+ * < Content-Type: text/html */
+	
+	char buffer[100];
+
+	sprintf(buffer, "HTTP/1.0 %d OK\r\n", reqinfo->status);
+	Writeline(connfd, buffer, strlen(buffer));
+
+	Writeline(connfd, "Server: Mapache v0.1\r\n", 20);
+	Writeline(connfd, "Allow: POST,OPTIONS,GET", 23);
+	Writeline(connfd, "Content-Length: 0", 17);
+	Writeline(connfd, "Content-Type: text/html\r\n", 25);
+	Writeline(connfd, "\r\n", 2);
+
+	return 0;
+}
+
+int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
+	if (!strncmp(recvline, "OPTIONS ", 8)) {
+		reqinfo->method = OPTIONS;
+		reqinfo->status = 200;
+		comando_options(connfd, recvline, reqinfo);
+		printf("OPTIONS!");;
+	}
+}
+
 int main (int argc, char **argv) {
 	/* Os sockets. Um que será o socket que vai escutar pelas conexões
 	 * e o outro que vai ser o socket específico de cada conexão */
@@ -62,6 +146,7 @@ int main (int argc, char **argv) {
 	char	recvline[MAXLINE + 1];
 	/* Armazena o tamanho da string lida do cliente */
 	ssize_t  n;
+	struct ReqInfo reqinfo;
    
 	if (argc != 2) {
 		fprintf(stderr,"Uso: %s <Porta>\n",argv[0]);
@@ -166,12 +251,15 @@ int main (int argc, char **argv) {
 					perror("fputs :( \n");
 					exit(6);
 				}
-				if (!strncmp(recvline, "OPTIONS ", 8)) {
+				parsear_comando(connfd, recvline, &reqinfo);
+/*				if (!strncmp(recvline, "OPTIONS ", 8)) {
+					reqinfo->method = OPTIONS;
+					reqinfo->status = 200;
+					comando_options(connfd, reqinfo)
 					printf("OPTIONS!");
-//	    				reqinfo->method = GET;
-//					buffer += 4;
-				}
-				write(connfd, recvline, strlen(recvline));
+//					recvline += 8;
+				}*/
+//				write(connfd, recvline, strlen(recvline));
 			}
 			/* ========================================================= */
 			/* ========================================================= */
