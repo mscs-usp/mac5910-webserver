@@ -166,6 +166,11 @@ int main (int argc, char **argv) {
 					perror("fputs :( \n");
 					exit(6);
 				}
+				if (!strncmp(recvline, "OPTIONS ", 8)) {
+					printf("OPTIONS!");
+//	    				reqinfo->method = GET;
+//					buffer += 4;
+				}
 				write(connfd, recvline, strlen(recvline));
 			}
 			/* ========================================================= */
