@@ -86,6 +86,19 @@ ssize_t Writeline(int sockd, const void *vptr, size_t n) {
 	return n;
 }
 
+void mynonprint(const char *buf, int max) {
+	int i;
+	for (i = 0; i < max; i++) {
+		if ((buf[i] >= 0 && buf[i] <=31) || (buf[i] == 127)) {
+			printf("\\%d", buf[i]);
+		}
+		else {
+			printf("%c", buf[i]);
+		}
+	}
+	printf("\n");
+}
+
 int Cabecalho_HTTP(int conn, struct ReqInfo * reqinfo) {
 
 	char buffer[100];
@@ -108,12 +121,17 @@ int comando_options(int connfd, char * recvline, struct ReqInfo * reqinfo) {
  * < Content-Length: 0
  * < Content-Type: text/html */
 	
-	char buffer[100];
+	char buffer[1000];
+	time_t now = time(0);
+	struct tm tm = *gmtime(&now);
 
 	sprintf(buffer, "HTTP/1.0 %d OK\r\n", reqinfo->status);
 	Writeline(connfd, buffer, strlen(buffer));
 
-	sprintf(buffer, "Server: Mapache v0.1\r\n");
+	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
+	Writeline(connfd, buffer, strlen(buffer));
+
+	sprintf(buffer, "Server: Mapache/0.1\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
 	sprintf(buffer, "Allow: POST,OPTIONS,GET\r\n");
@@ -261,45 +279,54 @@ int main (int argc, char **argv) {
 			/* ========================================================= */
 			/* TODO: É esta parte do código que terá que ser modificada
 			 * para que este servidor consiga interpretar comandos HTTP */
-
-			while ((buf_idx < MAXLINE) && (n = read(connfd, &buf[buf_idx], MAXLINE) > 0)) {
-				if (buf_idx > 0          && 
-				    '\n' == buf[buf_idx] &&
-				    '\r' == buf[buf_idx - 1]) {
+			
+			while ((buf_idx < MAXLINE) && (n = read(connfd, &buf[buf_idx], 1)) > 0) {
+				printf("[Cliente conectado no processo filho %d enviou:]\n", getpid());
+				if ((fputs(recvline, stdout)) == EOF) {
+					perror("fputs :( \n");
+					exit(6);
+				}
+				
+				printf("Recebidos %d bytes\n", n);
+				printf("Ultimos bytes n=%c, n-1=%c\n", recvline[n-6], recvline[n-5]);
+				mynonprint(buf, buf_idx);
+				buf_idx++;
+				if (buf_idx > 4            && 
+				    '\n' == buf[buf_idx-1] &&
+				    '\r' == buf[buf_idx-2] && 
+				    '\n' == buf[buf_idx-3] &&
+				    '\r' == buf[buf_idx-4]) {
 					break;
 				}
-				buf_idx++;
+				mynonprint(buf, buf_idx);
 			}
-			parsear_comando(connfd, recvline, &reqinfo);
+			parsear_comando(connfd, buf, &reqinfo);
 
-//			primeiro_crlf = 0;
-//			while ((n=read(connfd, recvline, MAXLINE)) > 0) {
-//				recvline[n]=0;
-//				printf("[Cliente conectado no processo filho %d enviou:] ",getpid());
-//				if ((fputs(recvline,stdout)) == EOF) {
-//					perror("fputs :( \n");
-//					exit(6);
-//				}
-//				
-//				if (!strncmp(recvline, "\n", 1)) {
-//					primeiro_crlf = 1;
-//				}
-//				if (primeiro_crlf && !strncmp(recvline, "\n", 1)) {
-//					parsear_comando(connfd, recvline, &reqinfo);
-//					primeiro_crlf = 0;
-//				}
-//				parsear_comando(connfd, recvline, &reqinfo);
-/*				if (!strncmp(recvline, "OPTIONS ", 8)) {
-					reqinfo->method = OPTIONS;
-					reqinfo->status = 200;
-					comando_options(connfd, reqinfo)
-					printf("OPTIONS!");
-//					recvline += 8;
-				}*/
-//				write(connfd, recvline, strlen(recvline));
-//			}
+/*			primeiro_crlf = 0;
+			size_t buf_idx = 0;
+			char buf[MAXLINE] = { 0 };
+			while ((buf_idx < MAXLINE) && (n=read(connfd, recvline, MAXLINE)) > 0) {
+				recvline[n]=0;
+				printf("[Cliente conectado no processo filho %d enviou:]\n",getpid());
+				if ((fputs(recvline,stdout)) == EOF) {
+					perror("fputs :( \n");
+					exit(6);
+				}
+				
+				printf("Recebidos %d bytes\n", n);
+				printf("Ultimos bytes n=%c, n-1=%c\n", recvline[n-6], recvline[n-5]);
+				mynonprint(recvline, n);	
+				if (n > 4          && 
+				    '\n' == recvline[n-1] &&
+				    '\r' == recvline[n-2] && 
+				    '\n' == recvline[n-3] &&
+				    '\r' == recvline[n-4]) {
+//					break;
+					printf("Identificados dois saltos de linha, procesando comando...\n");
+					parsear_comando(connfd, recvline, &reqinfo);
+				}
+			}*/
 
-//			parsear_comando(connfd, recvline, &reqinfo);
 			//processa comando...
 			/* ========================================================= */
 			/* ========================================================= */
