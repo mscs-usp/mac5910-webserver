@@ -29,6 +29,10 @@ $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Compiled "$<" successfully!"
 
+compile:
+	@$(LINKER) $@ $(LFLAGS) $(OBJECTS)
+	@$(CC) $(CFLAGS) -c $< -o $@
+
 .PHONEY: clean
 clean:
 	@$(rm) $(OBJECTS)
@@ -39,5 +43,8 @@ remove: clean
 	@$(rm) $(BINDIR)/$(TARGET)
 	@echo "Executable removed!"
 
-run:
+run: #remove clean compile
 	./bin/mapache 8000
+
+kill:
+	killall mapache
