@@ -3,11 +3,12 @@ TARGET   = mapache
 
 CC       = gcc
 # compiling flags here
-CFLAGS   = -std=c99 -Wall -I.
+CFLAGS   = -std=c99 -g -Wall -I.
 
 LINKER   = gcc -o
 # linking flags here
-LFLAGS   = -Wall -I. -lm
+#LFLAGS   = -Wall -I. -lm
+LFLAGS   = 
 
 # change these to set the proper directories where each files shoould be
 SRCDIR   = src
