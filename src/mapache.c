@@ -161,6 +161,9 @@ int main (int argc, char **argv) {
 	/* Armazena o tamanho da string lida do cliente */
 	ssize_t  n;
 	struct ReqInfo reqinfo;
+	int primeiro_crlf;
+	size_t buf_idx = 0;
+	char buf[MAXLINE] = { 0 };
    
 	if (argc != 2) {
 		fprintf(stderr,"Uso: %s <Porta>\n",argv[0]);
@@ -258,14 +261,34 @@ int main (int argc, char **argv) {
 			/* ========================================================= */
 			/* TODO: É esta parte do código que terá que ser modificada
 			 * para que este servidor consiga interpretar comandos HTTP */
-			while ((n=read(connfd, recvline, MAXLINE)) > 0) {
-				recvline[n]=0;
-				printf("[Cliente conectado no processo filho %d enviou:] ",getpid());
-				if ((fputs(recvline,stdout)) == EOF) {
-					perror("fputs :( \n");
-					exit(6);
+
+			while ((buf_idx < MAXLINE) && (n = read(connfd, &buf[buf_idx], MAXLINE) > 0)) {
+				if (buf_idx > 0          && 
+				    '\n' == buf[buf_idx] &&
+				    '\r' == buf[buf_idx - 1]) {
+					break;
 				}
-				parsear_comando(connfd, recvline, &reqinfo);
+				buf_idx++;
+			}
+			parsear_comando(connfd, recvline, &reqinfo);
+
+//			primeiro_crlf = 0;
+//			while ((n=read(connfd, recvline, MAXLINE)) > 0) {
+//				recvline[n]=0;
+//				printf("[Cliente conectado no processo filho %d enviou:] ",getpid());
+//				if ((fputs(recvline,stdout)) == EOF) {
+//					perror("fputs :( \n");
+//					exit(6);
+//				}
+//				
+//				if (!strncmp(recvline, "\n", 1)) {
+//					primeiro_crlf = 1;
+//				}
+//				if (primeiro_crlf && !strncmp(recvline, "\n", 1)) {
+//					parsear_comando(connfd, recvline, &reqinfo);
+//					primeiro_crlf = 0;
+//				}
+//				parsear_comando(connfd, recvline, &reqinfo);
 /*				if (!strncmp(recvline, "OPTIONS ", 8)) {
 					reqinfo->method = OPTIONS;
 					reqinfo->status = 200;
@@ -274,8 +297,9 @@ int main (int argc, char **argv) {
 //					recvline += 8;
 				}*/
 //				write(connfd, recvline, strlen(recvline));
-			}
+//			}
 
+//			parsear_comando(connfd, recvline, &reqinfo);
 			//processa comando...
 			/* ========================================================= */
 			/* ========================================================= */
