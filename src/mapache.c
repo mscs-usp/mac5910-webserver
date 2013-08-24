@@ -106,9 +106,9 @@ int Cabecalho_HTTP(int conn, struct ReqInfo * reqinfo) {
 	sprintf(buffer, "HTTP/1.0 %d OK\r\n", reqinfo->status);
 	Writeline(conn, buffer, strlen(buffer));
 
-	Writeline(conn, "Server: Mapache v0.1\r\n", 20);
-	Writeline(conn, "Content-Type: text/html\r\n", 25);
-	Writeline(conn, "\r\n", 2);
+//	Writeline(conn, "Server: Mapache v0.1\r\n", 20);
+//	Writeline(conn, "Content-Type: text/html\r\n", 25);
+//	Writeline(conn, "\r\n", 2);
 
 	return 0;
 }
@@ -148,6 +148,52 @@ int comando_options(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	return 0;
 }
 
+int comando_post(int connfd, char * recvline, struct ReqInfo * reqinfo) {
+/*
+Request:
+        POST /post-form.php HTTP/1.1
+        Host: localhost
+        User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0
+        Accept: text/html,application/xhtml+xml,application/xml;q=0.9,* /*;q=0.8
+        Accept-Language: en-US,en;q=0.5
+        Accept-Encoding: gzip, deflate
+        Referer: http://localhost/post-form.php
+        Connection: keep-alive
+        Content-Type: application/x-www-form-urlencoded
+        Content-Length: 55
+//FIXME: Aqui va um salto de linha???
+        Fullname=Albert&UserAddress=My+address&BtnSubmit=Submit
+
+Response:
+
+        HTTP/1.1 201 Created
+        Date: ¿
+        Content-Length: 0
+        Location: http://example.com/foo/bar
+ */
+	
+	char buffer[1000];
+	time_t now = time(0);
+	struct tm tm = *gmtime(&now);
+
+	sprintf(buffer, "HTTP/1.0 %d Created\r\n", reqinfo->status);
+	Writeline(connfd, buffer, strlen(buffer));
+
+	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
+	Writeline(connfd, buffer, strlen(buffer));
+
+	sprintf(buffer, "Content-Length: 0\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+
+	sprintf(buffer, "Location: ...\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+
+	sprintf(buffer, "\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+
+	return 0;
+}
+
 int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	char *metodo;
 	char *recurso;
@@ -162,6 +208,12 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 		reqinfo->method = OPTIONS;
 		reqinfo->status = 200;
 		comando_options(connfd, recvline, reqinfo);
+	}
+
+	if (!strcmp(metodo,"POST")){
+		reqinfo->method = POST;
+		reqinfo->status = 201;
+		comando_post(connfd, recvline, reqinfo);
 	}
 }
 
@@ -298,7 +350,6 @@ int main (int argc, char **argv) {
 				    '\r' == buf[buf_idx-4]) {
 					break;
 				}
-				mynonprint(buf, buf_idx);
 			}
 			parsear_comando(connfd, buf, &reqinfo);
 
