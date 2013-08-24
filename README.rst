@@ -11,6 +11,10 @@ Teste...
 Development debug
 -----------------
 
+Debuging with cgdb:
+
+    http://www.youtube.com/watch?v=OKLR6rrsBmI
+
 Debuging with curl:
 
 .. code-block:: bash
