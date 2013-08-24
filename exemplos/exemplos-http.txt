@@ -26,11 +26,18 @@ Response:
 
 
 Request:
-	POST /foo/bar HTTP/1.1
-	Host: example.com
+	POST /post-form.php HTTP/1.1
+	Host: localhost
+	User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+	Accept-Language: en-US,en;q=0.5
+	Accept-Encoding: gzip, deflate
+	Referer: http://localhost/post-form.php
+	Connection: keep-alive
 	Content-Type: application/x-www-form-urlencoded
-	 
-	action=addentry&subject=Hello,%20World
+	Content-Length: 55
+
+	Fullname=Albert&UserAddress=My+address&BtnSubmit=Submit
 
 Response:
 
