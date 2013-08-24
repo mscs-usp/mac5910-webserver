@@ -8,6 +8,13 @@ Foram implementado unicamente os comandos:
 - POST
 - GET
 
+O codigo esta disponivel no repositorio git do Github no seguinte endereco:
+https://github.com/mscs-usp/mac5910-webserver
+
+Nesse projeto foi utilizado tambem o servico de integracao continua Travis.
+Resultados do build podem ser verificados no seguinte endereco:
+https://api.travis-ci.org/mscs-usp/mac5910-webserver
+
 Autores:
 - Albert De La Fuente
 - Renan De Melo
@@ -20,6 +27,9 @@ Execute no shell o seguinte comando:
 make
 
 Ele criara na pasta ./bin o binario "mapache".
+
+Nota:
+Foi incluida informacao de debug no processo de compilacao para poder usar gdb durante o desenvolvimento.
 
 
 Como executar:
@@ -57,8 +67,9 @@ Estrutura dos arquivos:
     └── ep1-options-wireshark.trace
 
 
-Links:
-------
+Outros targets do Makefile:
+---------------------------
 
-A ultima versao do codigo esta disponivel no repositorio git do Github:
-https://github.com/mscs-usp/mac5910-webserver
+make clean					Limpa os .o
+make remove					Apaga o conteudo de ./bin
+make kill					Mata o webserver caso esteja sendo executado
