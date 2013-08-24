@@ -1,0 +1,64 @@
+Servidor Web Mapache (Mock do Apache)
+=====================================
+
+Esse e um servidor web desenvolvido para uma atividade academica da disciplina MAC5910 no IME/USP
+
+Foram implementado unicamente os comandos:
+- OPTIONS
+- POST
+- GET
+
+Autores:
+- Albert De La Fuente
+- Renan De Melo
+
+
+Como compilar:
+--------------
+Execute no shell o seguinte comando:
+
+make
+
+Ele criara na pasta ./bin o binario "mapache".
+
+
+Como executar:
+--------------
+O servidor pode ser executado com a seguinte linha de comandos no shell:
+
+./bin/mapache 8000
+
+ou com o target run do Makefile com a seguinte linha de comandos no shell:
+
+make run
+
+
+Estrutura dos arquivos:
+-----------------------
+
+.
+├── bin						Diretorio com o arquivo executavel
+│   └── mapache
+├── ep1.pdf					Enunciado
+├── exemplos
+│   ├── exemplos-http.txt			Exemplos de requisicoes e respostas
+│   └── post-form.php				Exemplo de formulario web usando post
+├── LEIAME.txt					Esse arquivo
+├── Makefile
+├── obj						Diretorio onde sao guardados os arquivos .o
+│   └── mapache.o
+├── README.rst					Readme do github
+├── src						Diretorio com o codigo fonte
+│   └── mapache.c
+├── tarball.sh					Script para criar o tarball no formato requerido
+└── traces					Diretorio com capturas do Wireshark
+    ├── ep1-existe-wireshark.trace
+    ├── ep1-naoexiste-wireshark.trace
+    └── ep1-options-wireshark.trace
+
+
+Links:
+------
+
+A ultima versao do codigo esta disponivel no repositorio git do Github:
+https://github.com/mscs-usp/mac5910-webserver
