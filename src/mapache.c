@@ -156,31 +156,26 @@ int comando_get(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	time_t now = time(0);
 	struct tm tm = *gmtime(&now);
 
-	sprintf(buffer, "HTTP/1.1 %d Created\r\n", reqinfo->status);
+	sprintf(buffer, "HTTP/1.1 %d OK\r\n", reqinfo->status);
 	Writeline(connfd, buffer, strlen(buffer));
 
 	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
 	Writeline(connfd, buffer, strlen(buffer));
 
-
-
-	le_escreve_arquivo(connfd);
+	le_escreve_arquivo(connfd, reqinfo->resource);
 
 	return 0;
 }
 
-void le_escreve_arquivo(int connfd){
+void le_escreve_arquivo(int connfd,char* arquivo){
 	//"/home/renan/developer/mac5910-webserver/web/index.html";
-	
-
-
 
 	FILE *fp;
 	long lSize;
 	char *buffer;
 
-	fp = fopen ( "/home/renan/developer/mac5910-webserver/web/index.html" , "rb" );
-	if( !fp ) perror("/home/renan/developer/mac5910-webserver/web/index.html"),exit(1);
+	fp = fopen ( arquivo , "rb" );
+	if( !fp ) perror(arquivo),exit(1);
 
 	fseek( fp , 0L , SEEK_END);
 	lSize = ftell(fp);
@@ -195,28 +190,16 @@ void le_escreve_arquivo(int connfd){
 	sprintf(buffer, "\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
-	/* allocate memory for entire content */
 	buffer = calloc( 1, lSize+1 );
 	if( !buffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
 
-	/* copy the file into the buffer */
 	if( 1!=fread( buffer , lSize, 1 , fp) )
 		fclose(fp),free(buffer),fputs("entire read fails",stderr),exit(1);
-
-/* do your work here, buffer is a string contains the whole text */
 
 	Writeline(connfd, buffer, lSize);
 
 	fclose(fp);
 	free(buffer);
-
-	
-/*
-	Writeline(connfd, buffer, n);
-	printf("[Arquivo escrito! Fechando arquivo...]\n");
-	fclose(f);
-	printf("[Arquivo fechado!]\n");
-*/
 }
 
 
@@ -279,6 +262,7 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	if (!strcmp(metodo,"GET")){
 		reqinfo->method = GET;
 		reqinfo->httpVersion = versaoHTTP;
+		reqinfo->resource = "/home/renan/developer/mac5910-webserver/web/index.html";
 		reqinfo->status = 200;
 		comando_get(connfd, recvline, reqinfo);
 	}
