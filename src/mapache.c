@@ -53,6 +53,7 @@ enum Req_Method { GET, POST, OPTIONS, UNSUPPORTED };
 
 struct ReqInfo {
 	enum Req_Method method;
+	char	       *httpVersion;
 	char           *referer;
 	char           *useragent;
 	char           *resource;
@@ -125,7 +126,7 @@ int comando_options(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	time_t now = time(0);
 	struct tm tm = *gmtime(&now);
 
-	sprintf(buffer, "HTTP/1.0 %d OK\r\n", reqinfo->status);
+	sprintf(buffer, "HTTP/1.1 %d OK\r\n", reqinfo->status);
 	Writeline(connfd, buffer, strlen(buffer));
 
 	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
@@ -147,6 +148,77 @@ int comando_options(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 
 	return 0;
 }
+
+
+int comando_get(int connfd, char * recvline, struct ReqInfo * reqinfo) {
+	int SIZE = 1000;
+	char buffer[SIZE];
+	time_t now = time(0);
+	struct tm tm = *gmtime(&now);
+
+	sprintf(buffer, "HTTP/1.1 %d Created\r\n", reqinfo->status);
+	Writeline(connfd, buffer, strlen(buffer));
+
+	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
+	Writeline(connfd, buffer, strlen(buffer));
+
+
+
+	le_escreve_arquivo(connfd);
+
+	return 0;
+}
+
+void le_escreve_arquivo(int connfd){
+	//"/home/renan/developer/mac5910-webserver/web/index.html";
+	
+
+
+
+	FILE *fp;
+	long lSize;
+	char *buffer;
+
+	fp = fopen ( "/home/renan/developer/mac5910-webserver/web/index.html" , "rb" );
+	if( !fp ) perror("/home/renan/developer/mac5910-webserver/web/index.html"),exit(1);
+
+	fseek( fp , 0L , SEEK_END);
+	lSize = ftell(fp);
+	rewind(fp);
+
+	sprintf(buffer, "Content-Type: text/html\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+
+	sprintf(buffer, "Content-Length: %ld\r\n",lSize);
+	Writeline(connfd, buffer, strlen(buffer));
+
+	sprintf(buffer, "\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+
+	/* allocate memory for entire content */
+	buffer = calloc( 1, lSize+1 );
+	if( !buffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
+
+	/* copy the file into the buffer */
+	if( 1!=fread( buffer , lSize, 1 , fp) )
+		fclose(fp),free(buffer),fputs("entire read fails",stderr),exit(1);
+
+/* do your work here, buffer is a string contains the whole text */
+
+	Writeline(connfd, buffer, lSize);
+
+	fclose(fp);
+	free(buffer);
+
+	
+/*
+	Writeline(connfd, buffer, n);
+	printf("[Arquivo escrito! Fechando arquivo...]\n");
+	fclose(f);
+	printf("[Arquivo fechado!]\n");
+*/
+}
+
 
 int comando_post(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 /*
@@ -204,14 +276,23 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 
 	printf("Metodo: %s, b:%s, c:%s",metodo,recurso,versaoHTTP);
 
+	if (!strcmp(metodo,"GET")){
+		reqinfo->method = GET;
+		reqinfo->httpVersion = versaoHTTP;
+		reqinfo->status = 200;
+		comando_get(connfd, recvline, reqinfo);
+	}
+
 	if (!strcmp(metodo,"OPTIONS")){
 		reqinfo->method = OPTIONS;
+		reqinfo->httpVersion = versaoHTTP;
 		reqinfo->status = 200;
 		comando_options(connfd, recvline, reqinfo);
 	}
 
 	if (!strcmp(metodo,"POST")){
 		reqinfo->method = POST;
+		reqinfo->httpVersion = versaoHTTP;
 		reqinfo->status = 201;
 		comando_post(connfd, recvline, reqinfo);
 	}
