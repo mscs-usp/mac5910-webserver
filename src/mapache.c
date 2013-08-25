@@ -167,9 +167,20 @@ int comando_get(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	return 0;
 }
 
+char* getContentType(char* arquivo){
+    char* ext = strchr(arquivo,'.');
+    printf("extension - %s\nfilename - ",ext+1);
+    if(!strcmp(ext+1,"html")){
+	return "text/html";
+    }
+    if(!strcmp(ext+1,"png")){
+	return "image/png";
+    }
+    return "application/octet-stream";
+}
+
 void le_escreve_arquivo(int connfd,char* arquivo){
 	//"/home/renan/developer/mac5910-webserver/web/index.html";
-
 	FILE *fp;
 	long lSize;
 	char *buffer;
@@ -180,8 +191,8 @@ void le_escreve_arquivo(int connfd,char* arquivo){
 	fseek( fp , 0L , SEEK_END);
 	lSize = ftell(fp);
 	rewind(fp);
-
-	sprintf(buffer, "Content-Type: text/html\r\n");
+	
+	sprintf(buffer, "Content-Type: %s\r\n",getContentType(arquivo));
 	Writeline(connfd, buffer, strlen(buffer));
 
 	sprintf(buffer, "Content-Length: %ld\r\n",lSize);
