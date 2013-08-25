@@ -169,7 +169,6 @@ int comando_get(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 
 char* getContentType(char* arquivo){
     char* ext = strchr(arquivo,'.');
-    printf("extension - %s\nfilename - ",ext+1);
     if(!strcmp(ext+1,"html")){
 	return "text/html";
     }
@@ -181,6 +180,7 @@ char* getContentType(char* arquivo){
 
 void le_escreve_arquivo(int connfd,char* arquivo){
 	//"/home/renan/developer/mac5910-webserver/web/index.html";
+
 	FILE *fp;
 	long lSize;
 	char *buffer;
@@ -242,7 +242,7 @@ Response:
 	time_t now = time(0);
 	struct tm tm = *gmtime(&now);
 
-	sprintf(buffer, "HTTP/1.0 %d Created\r\n", reqinfo->status);
+	sprintf(buffer, "HTTP/1.1 %d Created\r\n", reqinfo->status);
 	Writeline(connfd, buffer, strlen(buffer));
 
 	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
@@ -273,7 +273,9 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	if (!strcmp(metodo,"GET")){
 		reqinfo->method = GET;
 		reqinfo->httpVersion = versaoHTTP;
-		reqinfo->resource = "/home/renan/developer/mac5910-webserver/web/index.html";
+		char actualpath [1000];
+		realpath("../web/index.html",actualpath);
+		reqinfo->resource = actualpath;
 		reqinfo->status = 200;
 		comando_get(connfd, recvline, reqinfo);
 	}
