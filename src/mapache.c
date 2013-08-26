@@ -149,22 +149,59 @@ int comando_options(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	return 0;
 }
 
+int arquivoExiste(const char *fname)
+{
+    FILE *file;
+    if (file = fopen(fname, "r"))
+    {
+        fclose(file);
+        return 1;
+    }
+    return 0;
+}
 
-int comando_get(int connfd, char * recvline, struct ReqInfo * reqinfo) {
+void comando_get(int connfd, char * recvline, struct ReqInfo * reqinfo) {
+	if(arquivoExiste(reqinfo->resource)){
+		le_escreve_arquivo(connfd,reqinfo->resource);
+	}
+	else{
+		arquivo_nao_encontrado(connfd,reqinfo->resource);
+	}
+}
+
+void arquivo_nao_encontrado(int connfd,char* arquivo){
 	int SIZE = 1000;
 	char buffer[SIZE];
 	time_t now = time(0);
 	struct tm tm = *gmtime(&now);
 
-	sprintf(buffer, "HTTP/1.1 %d OK\r\n", reqinfo->status);
+	sprintf(buffer, "HTTP/1.1 404 Not Found\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
-
 	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
 	Writeline(connfd, buffer, strlen(buffer));
-
-	le_escreve_arquivo(connfd, reqinfo->resource);
-
-	return 0;
+	sprintf(buffer, "Content-Type: text/html; charset=iso-8859-1\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+	sprintf(buffer, "Content-Length: 343\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+	sprintf(buffer, "Connection: Keep-Alive\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+	sprintf(buffer, "\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+	sprintf(buffer, "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+	sprintf(buffer, "<html><head>\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+	sprintf(buffer, "<title>404 Not Found</title>\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+	sprintf(buffer, "</head><body>\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+	sprintf(buffer, "<h1>Not Found</h1>\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+	sprintf(buffer, "<p>The requested URL /~batista/blabla was not found on this server.</p>\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+	sprintf(buffer, "</body></html>");
+	Writeline(connfd, buffer, strlen(buffer));
+	free(buffer);
 }
 
 char* getContentType(char* arquivo){
@@ -179,11 +216,20 @@ char* getContentType(char* arquivo){
 }
 
 void le_escreve_arquivo(int connfd,char* arquivo){
-	//"/home/renan/developer/mac5910-webserver/web/index.html";
+	int SIZE = 1000;
+	char buffer[SIZE];
+	time_t now = time(0);
+	struct tm tm = *gmtime(&now);
 
 	FILE *fp;
 	long lSize;
-	char *buffer;
+	char *fbuffer;
+
+	sprintf(buffer, "HTTP/1.1 200 OK\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+
+	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
+	Writeline(connfd, buffer, strlen(buffer));
 
 	fp = fopen ( arquivo , "rb" );
 	if( !fp ) perror(arquivo),exit(1);
@@ -201,15 +247,16 @@ void le_escreve_arquivo(int connfd,char* arquivo){
 	sprintf(buffer, "\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
-	buffer = calloc( 1, lSize+1 );
-	if( !buffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
+	fbuffer = calloc( 1, lSize+1 );
+	if( !fbuffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
 
-	if( 1!=fread( buffer , lSize, 1 , fp) )
-		fclose(fp),free(buffer),fputs("entire read fails",stderr),exit(1);
+	if( 1!=fread( fbuffer , lSize, 1 , fp) )
+		fclose(fp),free(fbuffer),fputs("entire read fails",stderr),exit(1);
 
-	Writeline(connfd, buffer, lSize);
+	Writeline(connfd, fbuffer, lSize);
 
 	fclose(fp);
+	free(fbuffer);
 	free(buffer);
 }
 
@@ -282,7 +329,6 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 		reqinfo->method = GET;
 		reqinfo->httpVersion = versaoHTTP;
 		reqinfo->resource = getAbsolutePath(recurso);
-		reqinfo->status = 200;
 		comando_get(connfd, recvline, reqinfo);
 	}
 
