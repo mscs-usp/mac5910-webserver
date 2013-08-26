@@ -160,9 +160,21 @@ int arquivoExiste(const char *fname)
     return 0;
 }
 
+
+char* getAbsolutePath(char* recurso){
+		char* prefixo= "../web";
+		char* path = malloc(strlen(prefixo) + strlen(recurso) + 1);
+		strcpy(path, prefixo);
+		strcat(path, recurso);
+		char actualpath [1000];
+		realpath(path,actualpath);
+		return actualpath;
+}
+
 void comando_get(int connfd, char * recvline, struct ReqInfo * reqinfo) {
-	if(arquivoExiste(reqinfo->resource)){
-		le_escreve_arquivo(connfd,reqinfo->resource);
+	char *arquivoAbsolute = getAbsolutePath(reqinfo->resource);
+	if(arquivoExiste(arquivoAbsolute)){
+		le_escreve_arquivo(connfd,arquivoAbsolute);
 	}
 	else{
 		arquivo_nao_encontrado(connfd,reqinfo->resource);
@@ -170,39 +182,28 @@ void comando_get(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 }
 
 void arquivo_nao_encontrado(int connfd,char* arquivo){
-
 	int SIZE = 1000;
 	char buffer[SIZE];
+	char content_buffer[SIZE];
 	time_t now = time(0);
 	struct tm tm = *gmtime(&now);
-
+	//Escrevendo o conteudo para saber o tamanho total
+	sprintf(content_buffer, "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n<html><head>\r\n<title>404 Not Found</title>\r\n</head><body>\r\n<h1>Not Found</h1>\r\n<p>The requested URL %s was not found on this server.</p>\r\n</body></html>",arquivo);
 	sprintf(buffer, "HTTP/1.1 404 Not Found\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
 	Writeline(connfd, buffer, strlen(buffer));
 	sprintf(buffer, "Content-Type: text/html; charset=iso-8859-1\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
-	sprintf(buffer, "Content-Length: 230\r\n");
+	sprintf(buffer, "Content-Length: %d\r\n",strlen(content_buffer));
 	Writeline(connfd, buffer, strlen(buffer));
 	sprintf(buffer, "Connection: Keep-Alive\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 	sprintf(buffer, "\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
-	sprintf(buffer, "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n");
-	Writeline(connfd, buffer, strlen(buffer));
-	sprintf(buffer, "<html><head>\r\n");
-	Writeline(connfd, buffer, strlen(buffer));
-	sprintf(buffer, "<title>404 Not Found</title>\r\n");
-	Writeline(connfd, buffer, strlen(buffer));
-	sprintf(buffer, "</head><body>\r\n");
-	Writeline(connfd, buffer, strlen(buffer));
-	sprintf(buffer, "<h1>Not Found</h1>\r\n");
-	Writeline(connfd, buffer, strlen(buffer));
-	sprintf(buffer, "<p>The requested URL /~batista/blabla was not found on this server.</p>\r\n");
-	Writeline(connfd, buffer, strlen(buffer));
-	sprintf(buffer, "</body></html>");
-	Writeline(connfd, buffer, strlen(buffer));
+	Writeline(connfd, content_buffer, strlen(content_buffer));
 	free(buffer);
+	free(content_buffer);
 }
 
 char* getContentType(char* arquivo){
@@ -215,6 +216,9 @@ char* getContentType(char* arquivo){
     }
     return "application/octet-stream";
 }
+
+
+
 
 void le_escreve_arquivo(int connfd,char* arquivo){
 	int SIZE = 1000;
@@ -308,15 +312,6 @@ Response:
 	return 0;
 }
 
-char* getAbsolutePath(char* recurso){
-		char* prefixo= "../web";
-		char* path = malloc(strlen(prefixo) + strlen(recurso) + 1);
-		strcpy(path, prefixo);
-		strcat(path, recurso);
-		char actualpath [1000];
-		realpath(path,actualpath);
-		return actualpath;
-}
 
 int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	char *metodo;
@@ -329,7 +324,7 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	if (!strcmp(metodo,"GET")){
 		reqinfo->method = GET;
 		reqinfo->httpVersion = versaoHTTP;
-		reqinfo->resource = getAbsolutePath(recurso);
+		reqinfo->resource = recurso;
 		comando_get(connfd, recvline, reqinfo);
 	}
 
