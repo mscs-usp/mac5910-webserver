@@ -170,6 +170,7 @@ void comando_get(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 }
 
 void arquivo_nao_encontrado(int connfd,char* arquivo){
+
 	int SIZE = 1000;
 	char buffer[SIZE];
 	time_t now = time(0);
@@ -181,7 +182,7 @@ void arquivo_nao_encontrado(int connfd,char* arquivo){
 	Writeline(connfd, buffer, strlen(buffer));
 	sprintf(buffer, "Content-Type: text/html; charset=iso-8859-1\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
-	sprintf(buffer, "Content-Length: 343\r\n");
+	sprintf(buffer, "Content-Length: 230\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 	sprintf(buffer, "Connection: Keep-Alive\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
