@@ -137,6 +137,7 @@ int comando_options(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 
 int arquivoExiste(const char *fname)
 {
+    //TODO verificar se eh diretorio
     FILE *file;
     if (file = fopen(fname, "r"))
     {
@@ -314,7 +315,15 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	metodo = strtok(recvline," ");
 	recurso = strtok (NULL, " ");
 	versaoHTTP = strtok (NULL, " ");
-	printf("Metodo: %s, b:%s, c:%s",metodo,recurso,versaoHTTP);
+
+
+	//printf("Vou interpretar isso aqui!!");
+	//Move ponteiro ate final de "Content-Type: "
+	//strtok(recvline, "Content-Length: ");
+	//char *conteudoString = strtok(NULL, "\r\n");
+
+	printf("conteudoString: %s",conteudoString);
+
 	if (!strcmp(metodo,"GET")){
 		reqinfo->method = GET;
 		reqinfo->httpVersion = versaoHTTP;
@@ -449,17 +458,17 @@ int main (int argc, char **argv) {
 			/* ========================================================= */
 			/* TODO: É esta parte do código que terá que ser modificada
 			 * para que este servidor consiga interpretar comandos HTTP */
-			
+
+			//Le cabecalho			
 			while ((buf_idx < MAXLINE) && (n = read(connfd, &buf[buf_idx], 1)) > 0) {
-				printf("[Cliente conectado no processo filho %d enviou:]\n", getpid());
 				if ((fputs(recvline, stdout)) == EOF) {
 					perror("fputs :( \n");
 					exit(6);
 				}
 				
-				printf("Recebidos %d bytes\n", n);
-				printf("Ultimos bytes n=%c, n-1=%c\n", recvline[n-6], recvline[n-5]);
-				mynonprint(buf, buf_idx);
+//				printf("Recebidos %d bytes\n", n);
+//				printf("Ultimos bytes n=%c, n-1=%c\n", recvline[n-6], recvline[n-5]);
+//				mynonprint(buf, buf_idx);
 				buf_idx++;
 				if (buf_idx > 4            && 
 				    '\n' == buf[buf_idx-1] &&
@@ -468,33 +477,8 @@ int main (int argc, char **argv) {
 				    '\r' == buf[buf_idx-4]) {
 					break;
 				}
-			}
+			}			
 			parsear_comando(connfd, buf, &reqinfo);
-
-/*			primeiro_crlf = 0;
-			size_t buf_idx = 0;
-			char buf[MAXLINE] = { 0 };
-			while ((buf_idx < MAXLINE) && (n=read(connfd, recvline, MAXLINE)) > 0) {
-				recvline[n]=0;
-				printf("[Cliente conectado no processo filho %d enviou:]\n",getpid());
-				if ((fputs(recvline,stdout)) == EOF) {
-					perror("fputs :( \n");
-					exit(6);
-				}
-				
-				printf("Recebidos %d bytes\n", n);
-				printf("Ultimos bytes n=%c, n-1=%c\n", recvline[n-6], recvline[n-5]);
-				mynonprint(recvline, n);	
-				if (n > 4          && 
-				    '\n' == recvline[n-1] &&
-				    '\r' == recvline[n-2] && 
-				    '\n' == recvline[n-3] &&
-				    '\r' == recvline[n-4]) {
-//					break;
-					printf("Identificados dois saltos de linha, procesando comando...\n");
-					parsear_comando(connfd, recvline, &reqinfo);
-				}
-			}*/
 
 			//processa comando...
 			/* ========================================================= */
