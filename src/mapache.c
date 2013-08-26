@@ -260,6 +260,16 @@ Response:
 	return 0;
 }
 
+char* getAbsolutePath(char* recurso){
+		char* prefixo= "../web";
+		char* path = malloc(strlen(prefixo) + strlen(recurso) + 1);
+		strcpy(path, prefixo);
+		strcat(path, recurso);
+		char actualpath [1000];
+		realpath(path,actualpath);
+		return actualpath;
+}
+
 int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	char *metodo;
 	char *recurso;
@@ -267,15 +277,11 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	metodo = strtok(recvline," ");
 	recurso = strtok (NULL, " ");
 	versaoHTTP = strtok (NULL, " ");
-
 	printf("Metodo: %s, b:%s, c:%s",metodo,recurso,versaoHTTP);
-
 	if (!strcmp(metodo,"GET")){
 		reqinfo->method = GET;
 		reqinfo->httpVersion = versaoHTTP;
-		char actualpath [1000];
-		realpath("../web/index.html",actualpath);
-		reqinfo->resource = actualpath;
+		reqinfo->resource = getAbsolutePath(recurso);
 		reqinfo->status = 200;
 		comando_get(connfd, recvline, reqinfo);
 	}
