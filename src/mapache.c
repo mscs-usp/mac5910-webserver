@@ -57,7 +57,7 @@ struct ReqInfo {
 	char           *referer;
 	char           *useragent;
 	char           *resource;
-	int             status;
+	char	       *content;
 };
 
 void Error_Quit(char const * msg) {
@@ -100,20 +100,6 @@ void mynonprint(const char *buf, int max) {
 	printf("\n");
 }
 
-int Cabecalho_HTTP(int conn, struct ReqInfo * reqinfo) {
-
-	char buffer[100];
-
-	sprintf(buffer, "HTTP/1.0 %d OK\r\n", reqinfo->status);
-	Writeline(conn, buffer, strlen(buffer));
-
-//	Writeline(conn, "Server: Mapache v0.1\r\n", 20);
-//	Writeline(conn, "Content-Type: text/html\r\n", 25);
-//	Writeline(conn, "\r\n", 2);
-
-	return 0;
-}
-
 int comando_options(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 /* HTTP/1.1 200 OK
  * < Date: Wed, 21 Aug 2013 01:17:31 GMT
@@ -126,7 +112,7 @@ int comando_options(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	time_t now = time(0);
 	struct tm tm = *gmtime(&now);
 
-	sprintf(buffer, "HTTP/1.1 %d OK\r\n", reqinfo->status);
+	sprintf(buffer, "HTTP/1.1 200 OK\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
 	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
@@ -294,7 +280,7 @@ Response:
 	time_t now = time(0);
 	struct tm tm = *gmtime(&now);
 
-	sprintf(buffer, "HTTP/1.1 %d Created\r\n", reqinfo->status);
+	sprintf(buffer, "HTTP/1.1 201 Created\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
 	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
@@ -331,14 +317,12 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	if (!strcmp(metodo,"OPTIONS")){
 		reqinfo->method = OPTIONS;
 		reqinfo->httpVersion = versaoHTTP;
-		reqinfo->status = 200;
 		comando_options(connfd, recvline, reqinfo);
 	}
 
 	if (!strcmp(metodo,"POST")){
 		reqinfo->method = POST;
 		reqinfo->httpVersion = versaoHTTP;
-		reqinfo->status = 201;
 		comando_post(connfd, recvline, reqinfo);
 	}
 }
