@@ -179,6 +179,8 @@ void arquivo_nao_encontrado(int connfd,char* arquivo){
 	Writeline(connfd, buffer, strlen(buffer));
 	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
 	Writeline(connfd, buffer, strlen(buffer));
+	sprintf(buffer, "Server: Mapache/0.1\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
 	sprintf(buffer, "Content-Type: text/html; charset=iso-8859-1\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 	sprintf(buffer, "Content-Length: %d\r\n",strlen(content_buffer));
@@ -229,6 +231,9 @@ void le_escreve_arquivo(int connfd,char* arquivo){
 	lSize = ftell(fp);
 	rewind(fp);
 	
+	sprintf(buffer, "Server: Mapache/0.1\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+
 	sprintf(buffer, "Content-Type: %s\r\n",getContentType(arquivo));
 	Writeline(connfd, buffer, strlen(buffer));
 
@@ -284,6 +289,9 @@ Response:
 	Writeline(connfd, buffer, strlen(buffer));
 
 	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
+	Writeline(connfd, buffer, strlen(buffer));
+
+	sprintf(buffer, "Server: Mapache/0.1\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
 	sprintf(buffer, "Content-Length: 0\r\n");
