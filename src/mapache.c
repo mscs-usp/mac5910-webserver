@@ -322,7 +322,7 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	//strtok(recvline, "Content-Length: ");
 	//char *conteudoString = strtok(NULL, "\r\n");
 
-	printf("conteudoString: %s",conteudoString);
+	//printf("conteudoString: %s",conteudoString);
 
 	if (!strcmp(metodo,"GET")){
 		reqinfo->method = GET;
