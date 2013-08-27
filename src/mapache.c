@@ -231,7 +231,7 @@ void le_escreve_arquivo(int connfd,char* arquivo){
 	fseek( fp , 0L , SEEK_END);
 	lSize = ftell(fp);
 	rewind(fp);
-	
+
 	sprintf(buffer, "Server: Mapache/0.1\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
@@ -253,7 +253,6 @@ void le_escreve_arquivo(int connfd,char* arquivo){
 	Writeline(connfd, fbuffer, lSize);
 
 	fclose(fp);
-	free(fbuffer);
 	free(buffer);
 }
 
