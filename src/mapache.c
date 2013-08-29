@@ -360,6 +360,10 @@ int main (int argc, char **argv) {
 	int primeiro_crlf;
 	size_t buf_idx = 0;
 	char buf[MAXLINE] = { 0 };
+	char *content_length;
+	char *recurso;
+	char *versaoHTTP;
+	int con_length;
    
 	if (argc != 2) {
 		fprintf(stderr,"Uso: %s <Porta>\n",argv[0]);
@@ -467,7 +471,19 @@ int main (int argc, char **argv) {
 				
 //				printf("Recebidos %d bytes\n", n);
 //				printf("Ultimos bytes n=%c, n-1=%c\n", recvline[n-6], recvline[n-5]);
-//				mynonprint(buf, buf_idx);
+				mynonprint(buf, buf_idx);
+				if (buf_idx > 330) {
+					//content_length = strpbrk(&buf, "Content-Length:");
+					
+					//recurso = strtok (NULL, " ");
+					//versaoHTTP = strtok (NULL, " ");
+					sscanf (buf, "Content-Length: %d\r\n", &con_length);
+					printf("\n\nCONTENT-LENGTH: '%d' '%s' '%s'\n\n", con_length, recurso, versaoHTTP);
+					
+					printf("\n\nCONTENT-LENGTH: '%s' '%s' '%s'\n\n", content_length, recurso, versaoHTTP);
+				}
+//	recurso = strtok (NULL, " ");
+//	versaoHTTP = strtok (NULL, " ");
 				buf_idx++;
 				if (buf_idx > 4            && 
 				    '\n' == buf[buf_idx-1] &&
