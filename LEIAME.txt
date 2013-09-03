@@ -43,6 +43,11 @@ ou com o target run do Makefile com a seguinte linha de comandos no shell:
 make run
 
 
+Onde colocar o conteudo:
+------------------------
+O home do servidor (htdocs) e a pasta web
+
+
 Estrutura dos arquivos:
 -----------------------
 
