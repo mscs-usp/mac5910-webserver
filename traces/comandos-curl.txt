@@ -1,0 +1,11 @@
+
+
+Comando GET encontrando recurso:
+curl -v http://localhost:8000/index.html
+
+Comando GET sem encontrar:
+curl -v http://localhost:8000/bla.html
+
+
+Comando POST:
+curl -v --data "param1=value1&param2=value2" http://localhost:8000/bla
