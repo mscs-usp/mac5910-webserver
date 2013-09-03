@@ -313,6 +313,11 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	recurso = strtok (NULL, " ");
 	versaoHTTP = strtok (NULL, " ");
 
+	int tamanho_conteudo = 0;
+	if(reqinfo->content)
+		tamanho_conteudo = strlen(reqinfo->content);
+	printf("Tamanho do conteudo: %d\n", tamanho_conteudo);
+
 	if (!strcmp(metodo,"GET")){
 		reqinfo->method = GET;
 		reqinfo->httpVersion = versaoHTTP;
@@ -472,23 +477,16 @@ int main (int argc, char **argv) {
 					}
 					buf_idx++;
 				}
-
-
 				int tamanho_linha = strlen(&buf[idx_inicio_linha]);
-				printf("Tamanho da linha:%d",tamanho_linha);
-
-				if(tamanho_linha == 0) //linha em branco
+				if(tamanho_linha == 0) //linha em branco (final dos headers)
 					break;
-
 				char linha[tamanho_linha];
 				strcpy (linha,&buf[idx_inicio_linha]);
-				printf("Lido na linha: %s \n",linha);
-
 				//verificando se possui content-length...
 				int content_length_str = "Content-Length:";
 				if(tamanho_linha > strlen(content_length_str)){
-					linha[strlen(content_length_str)] = '\0'; //colocando um final de string bem apos o ':' 
-					printf("Linha alterada:%s\n",linha);
+					//colocando um final de string bem apos o ':' para usar o strcasecmp
+					linha[strlen(content_length_str)] = '\0';  
 					if (strcasecmp (content_length_str, linha) == 0) {
 						content_length = atoi(&linha[strlen(content_length_str)+1]);
         					printf ("Content-length %d!!\n",content_length);
@@ -497,6 +495,14 @@ int main (int argc, char **argv) {
 				idx_inicio_linha = buf_idx;
 			}
 
+
+			//lendo conteudo (content) do request
+			(&reqinfo)->content = NULL;
+			if(content_length > 0){
+				(&reqinfo)->content = calloc(content_length+1,sizeof(char));
+				read(connfd, (&reqinfo)->content, content_length);
+				(&reqinfo)->content[content_length] = '\0'; //final da string!
+			}
 			parsear_comando(connfd, buf, &reqinfo);
 
 //    			free(buf);
