@@ -207,8 +207,6 @@ char* getContentType(char* arquivo){
 }
 
 
-
-
 void le_escreve_arquivo(int connfd,char* arquivo){
 	int SIZE = 1000;
 	char buffer[SIZE];
@@ -315,14 +313,6 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	recurso = strtok (NULL, " ");
 	versaoHTTP = strtok (NULL, " ");
 
-
-	//printf("Vou interpretar isso aqui!!");
-	//Move ponteiro ate final de "Content-Type: "
-	//strtok(recvline, "Content-Length: ");
-	//char *conteudoString = strtok(NULL, "\r\n");
-
-	//printf("conteudoString: %s",conteudoString);
-
 	if (!strcmp(metodo,"GET")){
 		reqinfo->method = GET;
 		reqinfo->httpVersion = versaoHTTP;
@@ -358,7 +348,6 @@ int main (int argc, char **argv) {
 	ssize_t  n;
 	struct ReqInfo reqinfo;
 	int primeiro_crlf;
-	size_t buf_idx = 0;
 	char buf[MAXLINE] = { 0 };
 	char *content_length;
 	char *recurso;
@@ -462,28 +451,68 @@ int main (int argc, char **argv) {
 			/* TODO: É esta parte do código que terá que ser modificada
 			 * para que este servidor consiga interpretar comandos HTTP */
 
-			//Le cabecalho			
+			//Le cabecalho
+
+			int content_length = 0;
+			size_t idx_inicio_linha = 0;
+			size_t buf_idx = 0;
+			while(1){
+				//le linha
+				while(1){
+					n = read(connfd, &buf[buf_idx], 1);
+					if ((fputs(recvline, stdout)) == EOF) {
+						perror("fputs :( \n");
+						exit(6);
+					}
+					if (buf_idx >= 2 && '\n' == buf[buf_idx] &&
+				    		'\r' == buf[buf_idx-1]) {
+						buf_idx = buf_idx-1;
+						buf[buf_idx] = '\0';
+						break;
+					}
+					buf_idx++;
+				}
+
+
+				int tamanho_linha = strlen(&buf[idx_inicio_linha]);
+				printf("Tamanho da linha:%d",tamanho_linha);
+
+				if(tamanho_linha == 0) //linha em branco
+					break;
+
+				char linha[tamanho_linha];
+				strcpy (linha,&buf[idx_inicio_linha]);
+				printf("Lido na linha: %s \n",linha);
+
+				//verificando se possui content-length...
+				int content_length_str = "Content-Length:";
+				if(tamanho_linha > strlen(content_length_str)){
+					linha[strlen(content_length_str)] = '\0'; //colocando um final de string bem apos o ':' 
+					printf("Linha alterada:%s\n",linha);
+					if (strcasecmp (content_length_str, linha) == 0) {
+						content_length = atoi(&linha[strlen(content_length_str)+1]);
+        					printf ("Content-length %d!!\n",content_length);
+    					}
+				}
+				idx_inicio_linha = buf_idx;
+			}
+
+			parsear_comando(connfd, buf, &reqinfo);
+
+//    			free(buf);
+			/*
 			while ((buf_idx < MAXLINE) && (n = read(connfd, &buf[buf_idx], 1)) > 0) {
 				if ((fputs(recvline, stdout)) == EOF) {
 					perror("fputs :( \n");
 					exit(6);
 				}
-				
-//				printf("Recebidos %d bytes\n", n);
-//				printf("Ultimos bytes n=%c, n-1=%c\n", recvline[n-6], recvline[n-5]);
 				mynonprint(buf, buf_idx);
 				if (buf_idx > 330) {
-					//content_length = strpbrk(&buf, "Content-Length:");
-					
-					//recurso = strtok (NULL, " ");
-					//versaoHTTP = strtok (NULL, " ");
 					sscanf (buf, "Content-Length: %d\r\n", &con_length);
 					printf("\n\nCONTENT-LENGTH: '%d' '%s' '%s'\n\n", con_length, recurso, versaoHTTP);
 					
 					printf("\n\nCONTENT-LENGTH: '%s' '%s' '%s'\n\n", content_length, recurso, versaoHTTP);
 				}
-//	recurso = strtok (NULL, " ");
-//	versaoHTTP = strtok (NULL, " ");
 				buf_idx++;
 				if (buf_idx > 4            && 
 				    '\n' == buf[buf_idx-1] &&
@@ -492,10 +521,12 @@ int main (int argc, char **argv) {
 				    '\r' == buf[buf_idx-4]) {
 					break;
 				}
-			}			
+			}
+			
 			parsear_comando(connfd, buf, &reqinfo);
+			*/
 
-			//processa comando...
+
 			/* ========================================================= */
 			/* ========================================================= */
 			/*                         EP1 FIM                           */
