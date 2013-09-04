@@ -268,7 +268,7 @@ Request:
         Connection: keep-alive
         Content-Type: application/x-www-form-urlencoded
         Content-Length: 55
-//FIXME: Aqui va um salto de linha???
+
         Fullname=Albert&UserAddress=My+address&BtnSubmit=Submit
 
 Response:
@@ -295,7 +295,7 @@ Response:
 	sprintf(buffer, "Content-Length: 0\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
-	sprintf(buffer, "Location: ...\r\n");
+	sprintf(buffer, "Location: http://example.com/foo/bar\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
 	sprintf(buffer, "\r\n");
@@ -323,18 +323,17 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 		reqinfo->httpVersion = versaoHTTP;
 		reqinfo->resource = recurso;
 		comando_get(connfd, recvline, reqinfo);
-	}
-
-	if (!strcmp(metodo,"OPTIONS")){
+	} else if (!strcmp(metodo,"OPTIONS")){
 		reqinfo->method = OPTIONS;
 		reqinfo->httpVersion = versaoHTTP;
 		comando_options(connfd, recvline, reqinfo);
-	}
-
-	if (!strcmp(metodo,"POST")){
+	} else if (!strcmp(metodo,"POST")){
 		reqinfo->method = POST;
 		reqinfo->httpVersion = versaoHTTP;
 		comando_post(connfd, recvline, reqinfo);
+	} else {
+		reqinfo->method = UNSUPPORTED
+		printf("PANIC: Mapache nao entende seu sotaque\n");
 	}
 }
 
@@ -481,7 +480,7 @@ int main (int argc, char **argv) {
 				if(tamanho_linha == 0) //linha em branco (final dos headers)
 					break;
 				char linha[tamanho_linha];
-				strcpy (linha,&buf[idx_inicio_linha]);
+				strcpy (linha, &buf[idx_inicio_linha]);
 				//verificando se possui content-length...
 				int content_length_str = "Content-Length:";
 				if(tamanho_linha > strlen(content_length_str)){
