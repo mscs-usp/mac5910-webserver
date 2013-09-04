@@ -1,49 +1,75 @@
+OPTIONS:
+========
+
+OPTIONS LONG REQUEST:
+---------------------
+OPTIONS * HTTP/1.1
+Host: example.com
+
+OPTIONS SHORT REQUEST:
+----------------------
+curl -v --request OPTIONS http://127.0.0.1:8000
+
+OPTIONS RESPONSE:
+-----------------
+HTTP/1.1 200 OK
+Date: …
+Allow: OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE
+Content-Length: 0
+
+
+GET:
+====
+
+GET LONG REQUEST:
+-----------------
+GET /foo/bar HTTP/1.1
+Host: example.com
+
+GET SHORT REQUEST:
+------------------
+curl -v --request GET http://127.0.0.1:8000/index.html
+
+GET RESPONSE:
+-------------
+
+HTTP/1.1 200 OK
+Date: …
+Content-Type: text/html;charset=utf-8
+Content-Length: 12345
+
+<!DOCTYPE …
+
+
+POST:
+=====
+
+POST LONG REQUEST:
+------------------
+POST /index.html HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://localhost/post-form.php
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 30
+
+firstName=Albert&lastName=Test
+
+POST SHORT REQUEST:
+-------------------
+curl -v --request POST --data "param1=value1&param2=value2" http://127.0.0.1:8000/index.html
+
+POST RESPONSE:
+--------------
+
+HTTP/1.1 201 Created
+Date: …
+Content-Length: 0
+Location: http://example.com/foo/bar 
+
+
 http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
-
-
-
-Request:
-	OPTIONS * HTTP/1.1
-	Host: example.com
-
-Response:
-
-	HTTP/1.1 200 OK
-	Date: …
-	Allow: OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE
-	Content-Length: 0
-
-
-Request:
-	GET /foo/bar HTTP/1.1
-	Host: example.com
-
-Response:
-	HTTP/1.1 200 OK
-	Date: …
-	Content-Type: text/html;charset=utf-8
-	Content-Length: 12345
- 
-	<!DOCTYPE …
-
-
-Request:
-	POST /post-form.php HTTP/1.1
-	Host: localhost
-	User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:23.0) Gecko/20100101 Firefox/23.0
-	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-	Accept-Language: en-US,en;q=0.5
-	Accept-Encoding: gzip, deflate
-	Referer: http://localhost/post-form.php
-	Connection: keep-alive
-	Content-Type: application/x-www-form-urlencoded
-	Content-Length: 55
-
-	Fullname=Albert&UserAddress=My+address&BtnSubmit=Submit
-
-Response:
-
-	HTTP/1.1 201 Created
-	Date: …
-	Content-Length: 0
-	Location: http://example.com/foo/bar 
