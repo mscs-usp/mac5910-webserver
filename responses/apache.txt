@@ -1,25 +1,16 @@
-afu@sam:~/Downloads> curl -v --request POST --data "param1=value1&param2=value2" http://127.0.0.1:80/index.html
-* About to connect() to 127.0.0.1 port 80 (#0)
-*   Trying 127.0.0.1...
-* connected
-* Connected to 127.0.0.1 (127.0.0.1) port 80 (#0)
-> POST /index.html HTTP/1.1
-> User-Agent: curl/7.28.1
-> Host: 127.0.0.1
-> Accept: */*
-> Content-Length: 27
-> Content-Type: application/x-www-form-urlencoded
-> 
-* upload completely sent off: 27 out of 27 bytes
-< HTTP/1.1 200 OK
-< Date: Wed, 04 Sep 2013 22:02:20 GMT
-< Server: Apache/2.2.22 (Linux/SUSE)
-< Last-Modified: Tue, 03 Sep 2013 20:13:11 GMT
-< ETag: "57f9-1ee-4e580516c6b08"
-< Accept-Ranges: bytes
-< Content-Length: 494
-< Content-Type: text/html
-< 
+START OF DUMP
+---
+POST FOUND
+---
+HTTP/1.1 200 OK
+Date: Wed, 04 Sep 2013 23:05:27 GMT
+Server: Apache/2.2.22 (Linux/SUSE)
+Last-Modified: Tue, 03 Sep 2013 20:13:11 GMT
+ETag: "57f9-1ee-4e580516c6b08"
+Accept-Ranges: bytes
+Content-Length: 494
+Content-Type: text/html
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -38,26 +29,18 @@ afu@sam:~/Downloads> curl -v --request POST --data "param1=value1&param2=value2"
 </body>
 </html>
 
-* Connection #0 to host 127.0.0.1 left intact
-* Closing connection #0
-afu@sam:~/Downloads> curl -v --request GET http://127.0.0.1:80/index.html* About to connect() to 127.0.0.1 port 80 (#0)
-*   Trying 127.0.0.1...
-* connected
-* Connected to 127.0.0.1 (127.0.0.1) port 80 (#0)
-> GET /index.html HTTP/1.1
-> User-Agent: curl/7.28.1
-> Host: 127.0.0.1
-> Accept: */*
-> 
-< HTTP/1.1 200 OK
-< Date: Wed, 04 Sep 2013 22:03:05 GMT
-< Server: Apache/2.2.22 (Linux/SUSE)
-< Last-Modified: Tue, 03 Sep 2013 20:13:11 GMT
-< ETag: "57f9-1ee-4e580516c6b08"
-< Accept-Ranges: bytes
-< Content-Length: 494
-< Content-Type: text/html
-< 
+---
+GET FOUND
+---
+HTTP/1.1 200 OK
+Date: Wed, 04 Sep 2013 23:05:27 GMT
+Server: Apache/2.2.22 (Linux/SUSE)
+Last-Modified: Tue, 03 Sep 2013 20:13:11 GMT
+ETag: "57f9-1ee-4e580516c6b08"
+Accept-Ranges: bytes
+Content-Length: 494
+Content-Type: text/html
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -76,24 +59,129 @@ afu@sam:~/Downloads> curl -v --request GET http://127.0.0.1:80/index.html* About
 </body>
 </html>
 
-* Connection #0 to host 127.0.0.1 left intact
-* Closing connection #0
-afu@sam:~/Downloads> curl -v --request OPTIONS http://127.0.0.1:80/index.html
-* About to connect() to 127.0.0.1 port 80 (#0)
-*   Trying 127.0.0.1...
-* connected
-* Connected to 127.0.0.1 (127.0.0.1) port 80 (#0)
-> OPTIONS /index.html HTTP/1.1
-> User-Agent: curl/7.28.1
-> Host: 127.0.0.1
-> Accept: */*
-> 
-< HTTP/1.1 200 OK
-< Date: Wed, 04 Sep 2013 22:03:10 GMT
-< Server: Apache/2.2.22 (Linux/SUSE)
-< Allow: GET,HEAD,POST,OPTIONS,TRACE
-< Content-Length: 0
-< Content-Type: text/html
-< 
-* Connection #0 to host 127.0.0.1 left intact
-* Closing connection #0
+---
+OPTIONS
+---
+HTTP/1.1 200 OK
+Date: Wed, 04 Sep 2013 23:05:27 GMT
+Server: Apache/2.2.22 (Linux/SUSE)
+Allow: GET,HEAD,POST,OPTIONS,TRACE
+Content-Length: 0
+Content-Type: text/html
+
+---
+POST NOT FOUND
+---
+HTTP/1.1 404 Not Found
+Date: Wed, 04 Sep 2013 23:05:27 GMT
+Server: Apache/2.2.22 (Linux/SUSE)
+Vary: accept-language,accept-charset
+Accept-Ranges: bytes
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+Content-Language: en
+
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Object not found!</title>
+<link rev="made" href="mailto:%5bno%20address%20given%5d" />
+<style type="text/css"><!--/*--><![CDATA[/*><!--*/ 
+    body { color: #000000; background-color: #FFFFFF; }
+    a:link { color: #0000CC; }
+    p, address {margin-left: 3em;}
+    span {font-size: smaller;}
+/*]]>*/--></style>
+</head>
+
+<body>
+<h1>Object not found!</h1>
+<p>
+
+
+    The requested URL was not found on this server.
+
+  
+
+    If you entered the URL manually please check your
+    spelling and try again.
+
+  
+
+</p>
+<p>
+If you think this is a server error, please contact
+the <a href="mailto:%5bno%20address%20given%5d">webmaster</a>.
+
+</p>
+
+<h2>Error 404</h2>
+<address>
+  <a href="/">127.0.0.1</a><br />
+  
+  <span>Wed Sep  4 20:05:27 2013<br />
+  Apache/2.2.22 (Linux/SUSE)</span>
+</address>
+</body>
+</html>
+
+---
+GET NOT FOUND
+---
+HTTP/1.1 404 Not Found
+Date: Wed, 04 Sep 2013 23:05:27 GMT
+Server: Apache/2.2.22 (Linux/SUSE)
+Vary: accept-language,accept-charset
+Accept-Ranges: bytes
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=iso-8859-1
+Content-Language: en
+
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Object not found!</title>
+<link rev="made" href="mailto:%5bno%20address%20given%5d" />
+<style type="text/css"><!--/*--><![CDATA[/*><!--*/ 
+    body { color: #000000; background-color: #FFFFFF; }
+    a:link { color: #0000CC; }
+    p, address {margin-left: 3em;}
+    span {font-size: smaller;}
+/*]]>*/--></style>
+</head>
+
+<body>
+<h1>Object not found!</h1>
+<p>
+
+
+    The requested URL was not found on this server.
+
+  
+
+    If you entered the URL manually please check your
+    spelling and try again.
+
+  
+
+</p>
+<p>
+If you think this is a server error, please contact
+the <a href="mailto:%5bno%20address%20given%5d">webmaster</a>.
+
+</p>
+
+<h2>Error 404</h2>
+<address>
+  <a href="/">127.0.0.1</a><br />
+  
+  <span>Wed Sep  4 20:05:27 2013<br />
+  Apache/2.2.22 (Linux/SUSE)</span>
+</address>
+</body>
+</html>
+
