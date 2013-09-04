@@ -122,7 +122,7 @@ int comando_options(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	sprintf(buffer, "Server: Mapache/0.1\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
-	sprintf(buffer, "Allow: POST,OPTIONS,GET\r\n");
+	sprintf(buffer, "Allow: GET,POST,OPTIONS\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
 	sprintf(buffer, "Content-Length: 0\r\n");
@@ -331,11 +331,11 @@ Response:
 	
 	// Isto foi deixado assim propositalmente, porem poderiam ser parametros
 	// no futuro
-	sprintf(buffer, "Keep-Alive: timeout=%d, max=%d\r\n", 15, 96);
-	Writeline(connfd, buffer, strlen(buffer));
+	//sprintf(buffer, "Keep-Alive: timeout=%d, max=%d\r\n", 15, 96);
+	//Writeline(connfd, buffer, strlen(buffer));
 	
-	sprintf(buffer, "Connection: Keep-Alive\r\n");
-	Writeline(connfd, buffer, strlen(buffer));
+	//sprintf(buffer, "Connection: Keep-Alive\r\n");
+	//Writeline(connfd, buffer, strlen(buffer));
 	
 	sprintf(buffer, "Content-Type: %s\r\n", getContentType(arquivo));
 	Writeline(connfd, buffer, strlen(buffer));
