@@ -2,6 +2,7 @@
 TARGET   = mapache
 
 CC       = gcc
+SH	 = sh
 # compiling flags here
 CFLAGS   = -std=c99 -g -Wall -I.
 
@@ -44,7 +45,7 @@ remove: clean
 	@echo "Executable removed!"
 
 run: #remove clean compile
-	./bin/mapache 8000
+	@$(SH) run.sh
 
 kill:
 	killall mapache
