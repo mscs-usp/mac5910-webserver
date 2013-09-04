@@ -332,7 +332,7 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 		reqinfo->httpVersion = versaoHTTP;
 		comando_post(connfd, recvline, reqinfo);
 	} else {
-		reqinfo->method = UNSUPPORTED
+		reqinfo->method = UNSUPPORTED;
 		printf("PANIC: Mapache nao entende seu sotaque\n");
 	}
 }
