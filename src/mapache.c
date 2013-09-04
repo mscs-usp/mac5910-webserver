@@ -44,6 +44,7 @@
 #include <arpa/inet.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #define LISTENQ 1
 #define MAXDATASIZE 100
@@ -254,8 +255,7 @@ void le_escreve_arquivo(int connfd,char* arquivo){
 	free(buffer);
 }
 
-
-int comando_post(int connfd, char * recvline, struct ReqInfo * reqinfo) {
+void le_escreve_arquivo_post(int connfd,char* arquivo){
 /*
 Request:
         POST /post-form.php HTTP/1.1
@@ -272,36 +272,97 @@ Request:
         Fullname=Albert&UserAddress=My+address&BtnSubmit=Submit
 
 Response:
+	HTTP/1.1 200 OK
+	Date: Tue, 03 Sep 2013 22:22:13 GMT
+	Server: Apache/2.2.22 (Linux/SUSE)
+	Last-Modified: Tue, 03 Sep 2013 20:13:11 GMT
+	ETag: "57f9-1ee-4e580516c6b08"
+	Accept-Ranges: bytes
+	Content-Length: 494
+	Keep-Alive: timeout=15, max=96
+	Connection: Keep-Alive
+	Content-Type: text/html
 
-        HTTP/1.1 201 Created
-        Date: ¿
-        Content-Length: 0
-        Location: http://example.com/foo/bar
- */
-	
-	char buffer[1000];
+	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	...
+	</html>
+
+*/
+	int SIZE = 1000;
+	char buffer[SIZE];
 	time_t now = time(0);
 	struct tm tm = *gmtime(&now);
 
-	sprintf(buffer, "HTTP/1.1 201 Created\r\n");
+	FILE *fp;
+	long lSize;
+	char *fbuffer;
+
+	struct stat fst;
+        bzero(&fst, sizeof(fst));
+	
+	printf("ENTROU3\n");
+	sprintf(buffer, "HTTP/1.1 200 OK\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
 	strftime(buffer, sizeof buffer, "Date: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
 	Writeline(connfd, buffer, strlen(buffer));
 
+	fp = fopen ( arquivo , "rb" );
+	if (!fp) { 
+		perror(arquivo);
+		exit(1);
+	}
+
+	fseek( fp , 0L , SEEK_END);
+	lSize = ftell(fp);
+	rewind(fp);
+
 	sprintf(buffer, "Server: Mapache/0.1\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
-
-	sprintf(buffer, "Content-Length: 0\r\n");
+	
+	stat(arquivo, &fst); // O arquivo existe pois a comprovacao foi feita antes
+	//tm = *gmtime(&fst.st_ctime);
+	tm = *gmtime(&fst.st_mtime);
+	strftime(buffer, sizeof buffer, "Last-Modified: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
 	Writeline(connfd, buffer, strlen(buffer));
 
-	sprintf(buffer, "Location: http://example.com/foo/bar\r\n");
+	sprintf(buffer, "Content-Length: %ld\r\n", lSize);
+	Writeline(connfd, buffer, strlen(buffer));
+	
+	// Isto foi deixado assim propositalmente, porem poderiam ser parametros
+	// no futuro
+	sprintf(buffer, "Keep-Alive: timeout=%d, max=%d\r\n", 15, 96);
+	Writeline(connfd, buffer, strlen(buffer));
+	
+	sprintf(buffer, "Connection: Keep-Alive\r\n");
+	Writeline(connfd, buffer, strlen(buffer));
+	
+	sprintf(buffer, "Content-Type: %s\r\n", getContentType(arquivo));
 	Writeline(connfd, buffer, strlen(buffer));
 
 	sprintf(buffer, "\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
-	return 0;
+	fbuffer = calloc( 1, lSize+1 );
+	if( !fbuffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
+
+	if( 1!=fread( fbuffer , lSize, 1 , fp) )
+		fclose(fp),free(fbuffer),fputs("entire read fails",stderr),exit(1);
+
+	Writeline(connfd, fbuffer, lSize);
+
+	fclose(fp);
+	free(buffer);
+}
+
+int comando_post(int connfd, char * recvline, struct ReqInfo * reqinfo) {
+	char *arquivoAbsolute = getAbsolutePath(reqinfo->resource);
+	if(arquivoExiste(arquivoAbsolute)){
+		le_escreve_arquivo_post(connfd,arquivoAbsolute);
+	}
+	else{
+		arquivo_nao_encontrado(connfd,reqinfo->resource);
+	}
 }
 
 
@@ -330,9 +391,12 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	} else if (!strcmp(metodo,"POST")){
 		reqinfo->method = POST;
 		reqinfo->httpVersion = versaoHTTP;
+		reqinfo->resource = recurso;
 		comando_post(connfd, recvline, reqinfo);
 	} else {
 		reqinfo->method = UNSUPPORTED;
+		reqinfo->httpVersion = versaoHTTP;
+		reqinfo->resource = recurso;
 		printf("PANIC: Mapache nao entende seu sotaque\n");
 	}
 }
