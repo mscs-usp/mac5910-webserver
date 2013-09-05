@@ -162,7 +162,7 @@ char* getAbsolutePath(char* recurso){
 void comando_get(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	char *arquivoAbsolute = getAbsolutePath(reqinfo->resource);
 	if(arquivoExiste(arquivoAbsolute)){
-		le_escreve_arquivo(connfd,arquivoAbsolute);
+		le_escreve_arquivo_get(connfd,arquivoAbsolute);
 	}
 	else{
 		arquivo_nao_encontrado(connfd,reqinfo->resource);
@@ -187,8 +187,8 @@ void arquivo_nao_encontrado(int connfd,char* arquivo){
 	Writeline(connfd, buffer, strlen(buffer));
 	sprintf(buffer, "Content-Length: %d\r\n",strlen(content_buffer));
 	Writeline(connfd, buffer, strlen(buffer));
-	sprintf(buffer, "Connection: Keep-Alive\r\n");
-	Writeline(connfd, buffer, strlen(buffer));
+	//sprintf(buffer, "Connection: Keep-Alive\r\n");
+	//Writeline(connfd, buffer, strlen(buffer));
 	sprintf(buffer, "\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 	Writeline(connfd, content_buffer, strlen(content_buffer));
@@ -208,7 +208,7 @@ char* getContentType(char* arquivo){
 }
 
 
-void le_escreve_arquivo(int connfd,char* arquivo){
+void le_escreve_arquivo_get(int connfd,char* arquivo){
 	int SIZE = 1000;
 	char buffer[SIZE];
 	time_t now = time(0);
@@ -217,6 +217,9 @@ void le_escreve_arquivo(int connfd,char* arquivo){
 	FILE *fp;
 	long lSize;
 	char *fbuffer;
+	
+	struct stat fst;
+        bzero(&fst, sizeof(fst));
 
 	sprintf(buffer, "HTTP/1.1 200 OK\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
@@ -225,7 +228,10 @@ void le_escreve_arquivo(int connfd,char* arquivo){
 	Writeline(connfd, buffer, strlen(buffer));
 
 	fp = fopen ( arquivo , "rb" );
-	if( !fp ) perror(arquivo),exit(1);
+	if (!fp) {
+		perror(arquivo);
+		exit(1);
+	}
 
 	fseek( fp , 0L , SEEK_END);
 	lSize = ftell(fp);
@@ -233,11 +239,17 @@ void le_escreve_arquivo(int connfd,char* arquivo){
 
 	sprintf(buffer, "Server: Mapache/0.1\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
-
-	sprintf(buffer, "Content-Type: %s\r\n",getContentType(arquivo));
+	
+	stat(arquivo, &fst); // O arquivo existe pois a comprovacao foi feita antes
+	//tm = *gmtime(&fst.st_ctime);
+	tm = *gmtime(&fst.st_mtime);
+	strftime(buffer, sizeof buffer, "Last-Modified: %a, %d %b %Y %H:%M:%S %Z\r\n", &tm);
 	Writeline(connfd, buffer, strlen(buffer));
 
 	sprintf(buffer, "Content-Length: %ld\r\n",lSize);
+	Writeline(connfd, buffer, strlen(buffer));
+
+	sprintf(buffer, "Content-Type: %s\r\n",getContentType(arquivo));
 	Writeline(connfd, buffer, strlen(buffer));
 
 	sprintf(buffer, "\r\n");
@@ -255,7 +267,7 @@ void le_escreve_arquivo(int connfd,char* arquivo){
 	free(buffer);
 }
 
-void le_escreve_arquivo_post(int connfd,char* arquivo){
+void le_escreve_arquivo_get_post(int connfd,char* arquivo){
 /*
 Request:
         POST /post-form.php HTTP/1.1
@@ -300,7 +312,6 @@ Response:
 	struct stat fst;
         bzero(&fst, sizeof(fst));
 	
-	printf("ENTROU3\n");
 	sprintf(buffer, "HTTP/1.1 200 OK\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 
@@ -358,7 +369,7 @@ Response:
 int comando_post(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	char *arquivoAbsolute = getAbsolutePath(reqinfo->resource);
 	if(arquivoExiste(arquivoAbsolute)){
-		le_escreve_arquivo_post(connfd,arquivoAbsolute);
+		le_escreve_arquivo_get_post(connfd,arquivoAbsolute);
 	}
 	else{
 		arquivo_nao_encontrado(connfd,reqinfo->resource);
