@@ -3,7 +3,7 @@ START OF DUMP
 POST FOUND
 ---
 HTTP/1.1 200 OK
-Date: Wed, 04 Sep 2013 23:05:54 GMT
+Date: Thu, 05 Sep 2013 00:19:17 GMT
 Server: Mapache/0.1
 Last-Modified: Tue, 03 Sep 2013 23:38:35 GMT
 Content-Length: 494
@@ -31,10 +31,10 @@ Content-Type: text/html
 GET FOUND
 ---
 HTTP/1.1 200 OK
-Date: Wed, 04 Sep 2013 23:05:54 GMT
+Date: Thu, 05 Sep 2013 00:19:17 GMT
 Server: Mapache/0.1
-Content-Type: text/html
 Content-Length: 494
+Content-Type: text/html
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -58,7 +58,7 @@ Content-Length: 494
 OPTIONS
 ---
 HTTP/1.1 200 OK
-Date: Wed, 04 Sep 2013 23:05:54 GMT
+Date: Thu, 05 Sep 2013 00:19:17 GMT
 Server: Mapache/0.1
 Allow: GET,POST,OPTIONS
 Content-Length: 0
@@ -68,11 +68,10 @@ Content-Type: text/html
 POST NOT FOUND
 ---
 HTTP/1.1 404 Not Found
-Date: Wed, 04 Sep 2013 23:05:54 GMT
+Date: Thu, 05 Sep 2013 00:19:17 GMT
 Server: Mapache/0.1
 Content-Type: text/html; charset=iso-8859-1
 Content-Length: 216
-Connection: Keep-Alive
 
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html><head>
@@ -84,11 +83,10 @@ Connection: Keep-Alive
 GET NOT FOUND
 ---
 HTTP/1.1 404 Not Found
-Date: Wed, 04 Sep 2013 23:05:54 GMT
+Date: Thu, 05 Sep 2013 00:19:18 GMT
 Server: Mapache/0.1
 Content-Type: text/html; charset=iso-8859-1
 Content-Length: 216
-Connection: Keep-Alive
 
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html><head>
