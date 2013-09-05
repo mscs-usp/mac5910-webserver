@@ -41,13 +41,14 @@ Como executar:
 --------------
 O servidor pode ser executado com a seguinte linha de comandos no shell:
 
-make run
+make run 
 ou
 ./run.sh
 
-Se for executar o servidor pela linha de comandos, o mesmo deve ser executado desde dentro da pasta bin.
-Qualquer execução de fora ou com rotas relativas pode dar erro pois a referencia da pasta htdocs esta
-configurada de forma explicita no código.
+Ambos executarão o servidor na porta 8000. Se for necessário executar o servidor em outra porta, é necessário que seja executado a linha de comando:
+./mapache <porta>>
+
+(ATENCAO!) Se este último comando for executado, é necessário que ele seja executado a partir do diretório bin, pois o servidor acessa seu diretório de htdocs como relativo, mais precisamente espera que esteja em ../web.
 
 
 Onde colocar o conteúdo:
