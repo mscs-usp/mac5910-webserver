@@ -46,7 +46,7 @@ ou
 ./run.sh
 
 Ambos executarão o servidor na porta 8000. Se for necessário executar o servidor em outra porta, é necessário que seja executado a linha de comando:
-./mapache <porta>>
+./mapache <porta>
 
 (ATENCAO!) Se este último comando for executado, é necessário que ele seja executado a partir do diretório bin, pois o servidor acessa seu diretório de htdocs como relativo, mais precisamente espera que esteja em ../web.
 
