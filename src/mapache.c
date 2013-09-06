@@ -262,7 +262,7 @@ void le_escreve_arquivo_get(int connfd,char* arquivo){
 	Writeline(connfd, fbuffer, lSize);
 
 	fclose(fp);
-	free(buffer);
+//	free(buffer);
 }
 
 void le_escreve_arquivo_get_post(int connfd,char* arquivo){
@@ -386,8 +386,6 @@ int parsear_comando(int connfd, char * recvline, struct ReqInfo * reqinfo) {
 	int tamanho_conteudo = 0;
 	if(reqinfo->content)
 		tamanho_conteudo = strlen(reqinfo->content);
-	printf("Tamanho do conteudo: %d\n", tamanho_conteudo);
-
 	if (!strcmp(metodo,"GET")){
 		reqinfo->method = GET;
 		reqinfo->httpVersion = versaoHTTP;
