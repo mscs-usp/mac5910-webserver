@@ -192,8 +192,6 @@ void arquivo_nao_encontrado(int connfd,char* arquivo){
 	sprintf(buffer, "\r\n");
 	Writeline(connfd, buffer, strlen(buffer));
 	Writeline(connfd, content_buffer, strlen(content_buffer));
-	free(buffer);
-	free(content_buffer);
 }
 
 char* getContentType(char* arquivo){
@@ -259,7 +257,7 @@ void le_escreve_arquivo_get(int connfd,char* arquivo){
 	if( !fbuffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
 
 	if( 1!=fread( fbuffer , lSize, 1 , fp) )
-		fclose(fp),free(fbuffer),fputs("entire read fails",stderr),exit(1);
+		fclose(fp),fputs("entire read fails",stderr),exit(1);
 
 	Writeline(connfd, fbuffer, lSize);
 
@@ -358,7 +356,7 @@ Response:
 	if( !fbuffer ) fclose(fp),fputs("memory alloc fails",stderr),exit(1);
 
 	if( 1!=fread( fbuffer , lSize, 1 , fp) )
-		fclose(fp),free(fbuffer),fputs("entire read fails",stderr),exit(1);
+		fclose(fp),fputs("entire read fails",stderr),exit(1);
 
 	Writeline(connfd, fbuffer, lSize);
 
