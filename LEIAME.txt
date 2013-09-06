@@ -41,13 +41,14 @@ Como executar:
 --------------
 O servidor pode ser executado com a seguinte linha de comandos no shell:
 
-make run
+make run 
 ou
 ./run.sh
 
-Se for executar o servidor pela linha de comandos, o mesmo deve ser executado desde dentro da pasta bin.
-Qualquer execução de fora ou com rotas relativas pode dar erro pois a referencia da pasta htdocs esta
-configurada de forma explicita no código.
+Ambos executarão o servidor na porta 8000. Se for necessário executar o servidor em outra porta, é necessário que seja executado a linha de comando:
+./mapache <porta>
+
+(ATENCAO!) Se este último comando for executado, é necessário que ele seja executado a partir do diretório bin, pois o servidor acessa seu diretório de htdocs como relativo, mais precisamente espera que esteja em ../web.
 
 
 Onde colocar o conteúdo:
@@ -59,11 +60,13 @@ Como testar:
 ------------
 Na pasta responses incluíram-se dois scripts. O script server-dump.sh
 gera um dump do servidor, chamada:
-./server-dump.sh 80 apache.txt
+./server-dump.sh 8000 apache.txt
 
 O script dump.sh nao e mais do que uma chamada duas vezes a esse script,
 só mudando a porta e o nome do arquivo resultante, chamando o kdiff3 no
 final para verificar os resultados.
+
+Também é possível se testar pelo navegador. Após iniciado o servidor, o exemplo indicado pelo professor pode ser acessado pela url: http://localhost:8000/index.html
 
 
 Estrutura dos arquivos:
